@@ -5,9 +5,6 @@ import (
 )
 
 type Metrics struct {
-	QueueingDuration   *prometheus.GaugeVec
-	NrOfLoggedInAgents prometheus.GaugeFunc
-	NrOfQueuedItems    prometheus.GaugeFunc
 }
 
 func NewMetrics(

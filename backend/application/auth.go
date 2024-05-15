@@ -115,3 +115,33 @@ func (a *Auth) VerifyOTP(requestContext *context.RequestContext, request *OTPInp
 	log.Debug().Msgf("user %s updated", user.Name)
 	return user, nil
 }
+
+func (a *Auth) ValidateOTP(requestContext *context.RequestContext, request *OTPInput) (*models.User, exceptions.ApplicationException) {
+	log := requestContext.BuildLog(a.logger, "application.Auth.GenerateOTP")
+	message := "token is invalid or user doesn't exist"
+	user, err := a.authRepo.Get(requestContext.TenantID(), request.UserId)
+	if err != nil {
+		return nil, exceptions.FailedQuerying(models.UserModelName, err)
+	}
+	valid := totp.Validate(request.Token, user.Otp_secret)
+	if !valid {
+		return nil, exceptions.FailedQuerying(models.UserModelName, fmt.Errorf(message))
+	}
+	log.Debug().Msgf("user %s validated", user.Name)
+	return user, nil
+}
+
+func (a *Auth) DisableOTP(requestContext *context.RequestContext, request *OTPInput) (*models.User, exceptions.ApplicationException) {
+	log := requestContext.BuildLog(a.logger, "application.Auth.GenerateOTP")
+	user, err := a.authRepo.Get(requestContext.TenantID(), request.UserId)
+	if err != nil {
+		return nil, exceptions.FailedQuerying(models.UserModelName, err)
+	}
+	user.Otp_enabled = false
+	user, err = a.authRepo.Update(requestContext.TenantID(), user)
+	if err != nil {
+		return nil, exceptions.FailedUpdating(models.UserModelName, err)
+	}
+	log.Debug().Msgf("user %s updated", user.Name)
+	return user, nil
+}

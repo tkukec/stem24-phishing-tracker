@@ -9,8 +9,6 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/pquerna/otp/totp"
-	"github.com/wpcodevo/two_factor_golang/models"
 )
 
 // NewAuth constructor for aUTH
@@ -157,15 +155,9 @@ func (ac *Auth) ValidateOTP(ctx *gin.Context) {
 		return
 	}
 
-	user, appErr := ac.authApp.ValidateOTP(requestContext, request)
+	_, appErr = ac.authApp.ValidateOTP(requestContext, request)
 	if appErr != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Invalid email or Password"})
-		return
-	}
-
-	valid := totp.Validate(payload.Token, user.Otp_secret)
-	if !valid {
-		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": message})
 		return
 	}
 
@@ -173,25 +165,27 @@ func (ac *Auth) ValidateOTP(ctx *gin.Context) {
 }
 
 func (ac *Auth) DisableOTP(ctx *gin.Context) {
-	var payload *models.OTPInput
+	var request *application.OTPInput
 
-	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
+	if err := ctx.ShouldBindJSON(&request); err != nil {
+		exception := exceptions.UnprocessableEntity(ac.ValidationErrors(err.(validator.ValidationErrors)), "")
+		ctx.JSON(exception.Status(), exception.ToDto())
 		return
 	}
 
-	var user models.User
-	result := ac.DB.First(&user, "id = ?", payload.UserId)
-	if result.Error != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "User doesn't exist"})
+	requestContext, appErr := ac.BuildRequestContext(ctx)
+	if appErr != nil {
+		ctx.JSON(appErr.Status(), appErr.ToDto())
 		return
 	}
-
-	user.Otp_enabled = false
-	ac.DB.Save(&user)
+	user, appErr := ac.authApp.DisableOTP(requestContext, request)
+	if appErr != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Invalid email or Password"})
+		return
+	}
 
 	userResponse := gin.H{
-		"id":          user.ID.String(),
+		"id":          user.ID,
 		"name":        user.Name,
 		"email":       user.Email,
 		"otp_enabled": user.Otp_enabled,

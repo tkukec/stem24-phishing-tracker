@@ -1,7 +1,7 @@
 package database
 
 import (
-	"github.com/asseco-voice/agent-management/shared"
+	"github.com/andrezz-b/stem24-phishing-tracker/shared/constants"
 	"math"
 )
 
@@ -25,7 +25,7 @@ func NewPaginatedResult(items Items, page *int, perPage *int, totalCount *int64)
 
 func calculateNrOfPages(perPage *int, totalCount *int64) *int {
 	if perPage == nil {
-		defaultValue := shared.DefaultPerPage
+		defaultValue := constants.DefaultPerPage
 		perPage = &defaultValue
 	}
 	totalPages := int(math.Ceil(float64(*totalCount) / float64(*perPage)))

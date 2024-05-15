@@ -4,7 +4,6 @@ import (
 	"github.com/andrezz-b/stem24-phishing-tracker/domain/models"
 	tenantService "github.com/andrezz-b/stem24-phishing-tracker/domain/services/tenant"
 	"github.com/andrezz-b/stem24-phishing-tracker/infrastructure/repositories"
-	"github.com/andrezz-b/stem24-phishing-tracker/shared"
 	"github.com/andrezz-b/stem24-phishing-tracker/shared/context"
 	"github.com/andrezz-b/stem24-phishing-tracker/shared/exceptions"
 	"github.com/rs/zerolog"
@@ -23,11 +22,6 @@ func NewTenant(createTenantService *tenantService.Tenant, tenantRepo repositorie
 type CreateTenantRequest struct {
 	ID   string `json:"-"`
 	Name string `json:"name" binding:"required"`
-}
-
-func (t *Tenant) HandleIamMessage(ctx *context.RequestContext, msg *amqp.EventMessage) {
-	log := ctx.BuildLog(t.logger, "application.Tenant.HandleIamMessage")
-	log.Debug().Msg(shared.ToJsonString(msg))
 }
 
 func (t *CreateTenantRequest) toServiceRequest() *tenantService.NewTenantRequest {

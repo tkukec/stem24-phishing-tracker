@@ -12,17 +12,17 @@ func Migrate(conn *database.Connection) error {
 	if err = conn.GetConnection().AutoMigrate(&models.Tenant{}); err != nil {
 		return err
 	}
-	if err = conn.GetConnection().AutoMigrate(&models.Agent{}); err != nil {
+	if err = conn.GetConnection().AutoMigrate(&models.User{}); err != nil {
 		return err
 	}
 	return err
 }
 
 func DropTables(conn *database.Connection) {
-	if err := conn.GetConnection().Migrator().DropTable(&models.Agent{}); err != nil {
+	if err := conn.GetConnection().Migrator().DropTable(&models.Tenant{}); err != nil {
 		log.Panic(err)
 	}
-	if err := conn.GetConnection().Migrator().DropTable(&models.Tenant{}); err != nil {
+	if err := conn.GetConnection().Migrator().DropTable(&models.User{}); err != nil {
 		log.Panic(err)
 	}
 }

@@ -1,7 +1,7 @@
 package database
 
 import (
-	"github.com/asseco-voice/agent-management/shared"
+	"github.com/andrezz-b/stem24-phishing-tracker/shared/constants"
 	"strings"
 	"time"
 )
@@ -26,7 +26,7 @@ type Query interface {
 
 func (q Pagination) Offset() int {
 	if q.Page == nil {
-		return shared.DefaultPage
+		return constants.DefaultPage
 	}
 
 	return *q.Page * q.Limit()
@@ -34,7 +34,7 @@ func (q Pagination) Offset() int {
 
 func (q Pagination) Limit() int {
 	if q.PerPage == nil {
-		return shared.DefaultPerPage
+		return constants.DefaultPerPage
 	}
 	return *q.PerPage
 }
