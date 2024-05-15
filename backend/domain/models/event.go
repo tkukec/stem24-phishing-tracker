@@ -17,5 +17,7 @@ type Event struct {
 	DNSRecord        string   `gorm:"type:varchar(500)"`
 	Keywords         []string `gorm:"type:varchar(1500)"`
 	Status           Status
-	Comments         []Comment
+	CommentID        string
+	StatusID         string
+	Comments         []Comment `gorm:""`
 }

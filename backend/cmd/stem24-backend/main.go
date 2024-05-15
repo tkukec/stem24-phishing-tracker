@@ -278,7 +278,7 @@ func httpRouter() *gin.Engine {
 	}
 	router.Use(cors.New(config))
 	router.Use(gin.RecoveryWithWriter(io.MultiWriter(writers.Writers()...)))
-	router.Use(middleware.XCorrelate())
+	//router.Use(middleware.XCorrelate())
 
 	router.GET("/api/health/live", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"live": "true"})
