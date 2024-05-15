@@ -2,7 +2,6 @@ import {phishingEventSchema} from "@/schemas/PhishingEventSchema.ts";
 import {zodResolver} from "@hookform/resolvers/zod"
 import {useForm} from "react-hook-form"
 import z from "zod"
-import { format } from "date-fns"
 import {Button} from "@/components/ui/button.tsx";
 import {
     Form,
@@ -14,143 +13,153 @@ import {
     FormMessage
 } from "@/components/ui/form.tsx";
 import {Input} from "@/components/ui/input"
-import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover.tsx";
-import {cn} from "@/lib/utils.ts";
-import { Calendar as CalendarIcon } from "lucide-react"
-import {Calendar} from "@/components/ui/calendar.tsx";
+import {
+    Select, SelectContent, SelectGroup, SelectItem,
+    SelectTrigger,
+    SelectValue
+} from "@/components/ui/select.tsx";
+import {getDnsRecords} from "@api/whois.ts";
+import {IWhoisRecords} from "@/types/WhoisRecords";
+
 const PhishingEventForm = () => {
     const form = useForm<z.infer<typeof phishingEventSchema>>({
-        resolver: zodResolver(phishingEventSchema)
+        resolver: zodResolver(phishingEventSchema),
+        defaultValues: {
+            status: "todo"
+        }
     })
-    const {watch, setValue} = form
+    const {setValue, getValues, watch} = form
 
-    const onSubmit = () => {
-
+    const getDomainInfo = async () => {
+        const domainRecords: IWhoisRecords = await getDnsRecords(getValues("maliciousUrl"))
+        const createdDate = domainRecords.WhoisRecord.createdDate
+        setValue("domainRegistrationDate", createdDate)
     }
 
+
+    const onSubmit = () => {
+    }
+
+
     return (
-        <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                <FormField
-                    control={form.control}
-                    name="name"
-                    render={({field}) => (
-                        <FormItem>
-                            <FormLabel>Username</FormLabel>
-                            <FormControl>
-                                <Input placeholder="shadcn" {...field} />
-                            </FormControl>
-                            <FormDescription>
-                                This is your public display name.
-                            </FormDescription>
-                            <FormMessage/>
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="brand"
-                    render={({field}) => (
-                        <FormItem>
-                            <FormLabel>Username</FormLabel>
-                            <FormControl>
-                                <Input placeholder="shadcn" {...field} />
-                            </FormControl>
-                            <FormDescription>
-                                This is your public display name.
-                            </FormDescription>
-                            <FormMessage/>
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="maliciousUrl"
-                    render={({field}) => (
-                        <FormItem>
-                            <FormLabel>Username</FormLabel>
-                            <FormControl>
-                                <Input placeholder="shadcn" {...field} />
-                            </FormControl>
-                            <FormDescription>
-                                This is your public display name.
-                            </FormDescription>
-                            <FormMessage/>
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="keyword"
-                    render={({field}) => (
-                        <FormItem>
-                            <FormLabel>Username</FormLabel>
-                            <FormControl>
-                                <Input placeholder="shadcn" {...field} />
-                            </FormControl>
-                            <FormDescription>
-                                This is your public display name.
-                            </FormDescription>
-                            <FormMessage/>
-                        </FormItem>
-                    )}
-                />
-                <Popover>
-                    <PopoverTrigger asChild>
-                        <Button
-                            variant={"outline"}
-                            className={cn(
-                                "w-[280px] justify-start text-left font-normal",
-                                !watch("domainRegistrationDate") && "text-muted-foreground"
-                            )}
-                        >
-                            <CalendarIcon className="mr-2 h-4 w-4"/>
-                            {watch("domainRegistrationDate") ? format(watch("domainRegistrationDate"), "PPP") : <span>Pick a date</span>}
-                        </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                        <Calendar
-                            mode="single"
-                            selected={watch("domainRegistrationDate")}
-                            onSelect={(date) => setValue("domainRegistrationDate", date)}
-                            initialFocus
-                        />
-                    </PopoverContent>
-                </Popover>
-                <FormField
-                    control={form.control}
-                    name="status"
-                    render={({field}) => (
-                        <FormItem>
-                            <FormLabel>Username</FormLabel>
-                            <FormControl>
-                                <Input placeholder="shadcn" {...field} />
-                            </FormControl>
-                            <FormDescription>
-                                This is your public display name.
-                            </FormDescription>
-                            <FormMessage/>
-                        </FormItem>
-                    )}
-                /> <FormField
-                control={form.control}
-                name="dnsRecords"
-                render={({field}) => (
+        <div className="rounded-xl border bg-card text-card-foreground shadow p-8">
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="flex-col space-y-8">
+                    <FormField
+                        control={form.control}
+                        name="name"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel>Name</FormLabel>
+                                <FormControl>
+                                    <Input {...field} />
+                                </FormControl>
+                                <FormDescription>
+                                    Add name for this phishing event
+                                </FormDescription>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="brand"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel>Affected brand</FormLabel>
+                                <FormControl>
+                                    <Input {...field} />
+                                </FormControl>
+                                <FormDescription>
+                                    What brand did this phishing affects
+                                </FormDescription>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="keyword"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel>Keywords</FormLabel>
+                                <FormControl>
+                                    <Input {...field} />
+                                </FormControl>
+                                <FormDescription>
+                                    Add keywords about this event separated by space, matching keywords can be for
+                                    example brand
+                                    name, product name
+                                </FormDescription>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="maliciousUrl"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel>Malicious Url</FormLabel>
+                                <FormControl>
+                                    <>
+                                        <Input {...field}  />
+                                        <Button type="button" onClick={getDomainInfo}>Get domain info</Button>
+                                    </>
+                                </FormControl>
+                                <FormDescription>
+                                    How does malicious url looks like
+                                </FormDescription>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
+
                     <FormItem>
-                        <FormLabel>Username</FormLabel>
+                        <FormLabel>Date of creation of malicious url</FormLabel>
                         <FormControl>
-                            <Input placeholder="shadcn" {...field} />
+                            <>
+                                <Input disabled value={(watch("domainRegistrationDate") ?? "").toString() ?? ""}/>
+                                                 </>
                         </FormControl>
-                        <FormDescription>
-                            This is your public display name.
-                        </FormDescription>
-                        <FormMessage/>
                     </FormItem>
-                )}
-            />
-                <Button type="submit">Submit</Button>
-            </form>
-        </Form>
+
+                    <FormField
+                        control={form.control}
+                        name="status"
+                        render={({field}) => (
+                            <FormItem className="flex-col align-normal">
+                                <FormLabel>Event Status</FormLabel>
+                                <FormControl>
+                                    <Select
+                                        {...field}
+                                        onValueChange={(value: "todo" | "in progress" | "done") => setValue("status", value)}
+                                    >
+                                        <SelectTrigger className="w-[180px]">
+                                            <SelectValue placeholder="Set event status"/>
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                <SelectItem value="todo">Todo</SelectItem>
+                                                <SelectItem value="in progress">In Progress</SelectItem>
+                                                <SelectItem value="done">Done</SelectItem>
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                </FormControl>
+                                <FormDescription>
+                                    Select current status of this event
+                                </FormDescription>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
+
+
+                    <Button type="submit">Add event</Button>
+                </form>
+            </Form>
+        </div>
     )
 };
 
