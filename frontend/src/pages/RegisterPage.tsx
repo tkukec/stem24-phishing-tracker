@@ -21,12 +21,18 @@ const formSchema = z.object({
     password: z.string().min(8, {
         message: "Password must be at least 8 characters.",
     }),
-    firstName: z.string().min(1, {
-        message: "First name is required.",
-    }),
-    lastName: z.string().min(1, {
-        message: "Last name is required.",
-    }),
+    firstName: z
+        .string()
+        .min(1, { message: "First name is required." })
+        .min(2, { message: "First name must be at least 2 characters long." })
+        .max(30, { message: "First name must not exceed 30 characters." })
+        .regex(/^[A-Za-z]+$/, { message: "First name can only contain letters." }),
+    lastName: z
+        .string()
+        .min(1, { message: "Last name is required." })
+        .min(2, { message: "Last name must be at least 2 characters long." })
+        .max(30, { message: "Last name must not exceed 30 characters." })
+        .regex(/^[A-Za-z]+$/, { message: "Last name can only contain letters." }),
 });
 
 export function RegisterPage() {

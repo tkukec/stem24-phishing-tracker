@@ -15,3 +15,8 @@ export const axiosPrivate = Axios.create({
   headers,
   withCredentials: true,
 });
+
+export const whoisInstance = Axios.create({
+    baseURL: 'https://www.whoisxmlapi.com',
+    headers
+});

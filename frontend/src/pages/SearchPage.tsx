@@ -29,7 +29,7 @@ const events: Array<IPhishingEvent> = [
         createdAt: new Date(),
         brand: "Brand 1",
         description: "Event 1 description",
-        maliciousUrl: "",
+        maliciousUrl: "test",
         domainRegistrationDate: new Date(),
         keyword: [],
         status: "todo",
