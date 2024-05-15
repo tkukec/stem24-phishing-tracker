@@ -1,0 +1,47 @@
+version: '3.5'
+
+services:
+  agent-management:
+    image: hrzg1do20.hr.asseco-see.local/voice/agent-management:dev
+    container_name: agent-management
+    build: ./
+    #restart: always
+    ports:
+      - 7080:8080
+    volumes:
+      - ./:/app
+      - ./docker/wait-for.sh:/wait-for.sh
+    networks:
+      - live
+    entrypoint: bash -c '/wait-for.sh live-database:5432 -t 60 -- go run cmd/agent-management/main.go'
+
+# UNCOMMENT EVERYTHING BELOW IF YOU WISH TO USE A SEPARATE DATABASE FROM THE ONE IN docker-deploy/
+#    entrypoint: bash -c '/wait-for.sh agent-management-db:5432 -t 60 -- go run cmd/agent-management/main.go'
+#    depends_on:
+#      - agent-management-db
+
+#  agent-management-db:
+#    image: hrzg1do20.hr.asseco-see.local/voice/postgresql:11.0.7-1
+#    container_name: agent-management-db
+#    restart: always
+#    environment:
+#      - APP_NAME=database
+#      - APP_VERSION=11.7.0
+#      - POSTGRES_POSTGRES_PASSWORD=postgres1236!
+#      - POSTGRES_USER=live
+#      - POSTGRES_PASSWORD=postgres1236!
+#      - POSTGRES_MULTIPLE_DATABASES=agent_management
+#      - BITNAMI_DEBUG=false
+#    volumes:
+#      - db-volume:/bitnami/postgresql
+#    networks:
+#      - live
+#    ports:
+#      - "54327:5432"
+
+#volumes:
+#  db-volume:
+
+networks:
+  live:
+    name: 'live'
