@@ -6,7 +6,9 @@ const PhishingEventFormPage = () => {
     return (
         <div>
             <Navbar/>
-            <PhishingEventForm/>
+            <div className="flex justify-center items-center">
+                <PhishingEventForm/>
+            </div>
         </div>
     );
 };

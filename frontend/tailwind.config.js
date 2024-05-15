@@ -60,12 +60,12 @@ module.exports = {
             },
             keyframes: {
                 "accordion-down": {
-                    from: { height: "0" },
-                    to: { height: "var(--radix-accordion-content-height)" },
+                    from: {height: "0"},
+                    to: {height: "var(--radix-accordion-content-height)"},
                 },
                 "accordion-up": {
-                    from: { height: "var(--radix-accordion-content-height)" },
-                    to: { height: "0" },
+                    from: {height: "var(--radix-accordion-content-height)"},
+                    to: {height: "0"},
                 },
             },
             animation: {
@@ -77,6 +77,7 @@ module.exports = {
                 35: "35%",
                 65: "65%",
                 87: "87%",
+                40: "40%"
             },
             spacing: {
                 300: "300px",
