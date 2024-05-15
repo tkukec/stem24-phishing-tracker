@@ -1,4 +1,5 @@
 export interface IPhishingEvent {
+    id: number;
     name: string,
     createdAt: Date,
     brand: string,

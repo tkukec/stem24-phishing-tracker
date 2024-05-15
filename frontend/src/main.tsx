@@ -10,6 +10,7 @@ import { AuthProvider } from "./context/AuthProvider.tsx";
 import Root from "./layouts/Root.tsx";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { LoginPage } from "./pages/LoginPage.tsx";
+import SearchPage from "./pages/SearchPage.tsx";
 
 const router = createBrowserRouter([
     {
@@ -33,6 +34,10 @@ const router = createBrowserRouter([
         element: <App />,
         errorElement: <LoginPage />,
     },
+    {
+        path: "/search",
+        element: <SearchPage />,
+    }
 ]);
 
 const queryClient = new QueryClient();
