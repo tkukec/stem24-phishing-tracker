@@ -24,3 +24,12 @@ export interface IDnsRecords{
     a: string
     mx: string
 }
+
+export interface PhishingEventSearchData {
+    name?: string,
+    startDate?: Date,
+    endDate?: Date,
+    brand?: string,
+    domainName?: string,
+    keywords?: Array<string>,
+}
