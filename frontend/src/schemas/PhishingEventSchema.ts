@@ -1,7 +1,6 @@
 import z from "zod"
 export const phishingEventSchema = z.object({
     name: z.string().min(2).max(50),
-    createdAt: z.date(),
     brand: z.string().min(2).max(50),
     description: z.string().min(10).max(1500),
     maliciousUrl: z.string().url(),
