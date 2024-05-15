@@ -2,7 +2,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
-
 import {
     Form,
     FormControl,
@@ -12,18 +11,20 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import AuthService from "@/api/auth";
 
 const formSchema = z.object({
     email: z.string().email({
         message: "Please enter a valid email.",
     }),
-    password: z.string().min(8, {
-        message: "Password must be at least 10 characters.",
+    password: z.string().min(1, {
+        message: "Password is required",
     }),
 });
 
 export const LoginPage = () => {
+    const navigate = useNavigate();
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
             email: "",
@@ -31,12 +32,13 @@ export const LoginPage = () => {
         },
         resolver: zodResolver(formSchema),
     });
-
-    function onSubmit(/*values: z.infer<typeof formSchema>*/) {
-        //     signIn("credentials", {
-        //       email: values.email as string,
-        //       password: values.password as string
-        //     });
+    const { mutate: login } = AuthService.useLogin();
+    function onSubmit(values: z.infer<typeof formSchema>) {
+        login(values, {
+            onSuccess: () => {
+                navigate("/");
+            },
+        });
     }
 
     return (

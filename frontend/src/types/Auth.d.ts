@@ -27,8 +27,6 @@ export interface RegisterData {
   password: string;
   firstName: string;
   lastName: string;
-  gender: string;
-  age: number;
 }
 
 export interface LoginData {
