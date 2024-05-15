@@ -194,3 +194,51 @@ func FailedFetchingServiceToken(errors ...error) ApplicationException {
 
 	return Internal("failed fetching service token", data, MissingConfiguration)
 }
+
+func EventNotFound(errors ...error) ApplicationException {
+	if len(errors) == 0 {
+		errors = []error{fmt.Errorf(recordNotFound)}
+	}
+
+	data := map[string][]string{
+		models.EventModelName: make([]string, len(errors)),
+	}
+
+	for i, err := range errors {
+		data[models.EventModelName][i] = err.Error()
+	}
+
+	return NotFound(data, ResourceNotFoundCode)
+}
+
+func StatusNotFound(errors ...error) ApplicationException {
+	if len(errors) == 0 {
+		errors = []error{fmt.Errorf(recordNotFound)}
+	}
+
+	data := map[string][]string{
+		models.StatusModelName: make([]string, len(errors)),
+	}
+
+	for i, err := range errors {
+		data[models.StatusModelName][i] = err.Error()
+	}
+
+	return NotFound(data, ResourceNotFoundCode)
+}
+
+func CommentNotFound(errors ...error) ApplicationException {
+	if len(errors) == 0 {
+		errors = []error{fmt.Errorf(recordNotFound)}
+	}
+
+	data := map[string][]string{
+		models.CommentModelName: make([]string, len(errors)),
+	}
+
+	for i, err := range errors {
+		data[models.CommentModelName][i] = err.Error()
+	}
+
+	return NotFound(data, ResourceNotFoundCode)
+}

@@ -3,9 +3,9 @@ package middleware
 import (
 	"bytes"
 	"fmt"
-	"git.asseco-see.hr/asseco-hr-voice/evil/go-chassis/v2/pkg/runtimebag"
-	"git.asseco-see.hr/asseco-hr-voice/evil/go-chassis/v2/pkg/shared/constants"
-	assecoContext "git.asseco-see.hr/asseco-hr-voice/evil/go-chassis/v2/pkg/shared/context"
+	"github.com/andrezz-b/stem24-phishing-tracker/shared/constants"
+	"github.com/andrezz-b/stem24-phishing-tracker/shared/context"
+	"github.com/andrezz-b/stem24-phishing-tracker/shared/runtimebag"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/rs/zerolog"
@@ -50,13 +50,13 @@ func Log(logger zerolog.Logger) gin.HandlerFunc {
 			tenantId = ""
 		}
 
-		var user *assecoContext.User
+		var user *context.User
 		token, _ := ctx.Get("user")
 		if token != nil {
-			user = assecoContext.NewUser(token.(*jwt.Token), tenantId.(string))
+			user = context.NewUser(token.(*jwt.Token), tenantId.(string))
 		}
 
-		reqContext := assecoContext.NewRequestContext(xCorrelation.(string), tenantId.(string), user, ctx)
+		reqContext := context.NewRequestContext(xCorrelation.(string), tenantId.(string), user, ctx)
 		log := reqContext.BuildLog(logger, "middleware.Log")
 
 		ctx.Next()

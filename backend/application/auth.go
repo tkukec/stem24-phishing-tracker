@@ -11,15 +11,21 @@ import (
 )
 
 // NewAuth constructor for Auth
-func NewAuth() *Auth {
-	app := &Auth{}
+func NewAuth(
+	authRepo repositories.UserRepository,
+	logger zerolog.Logger,
+) *Auth {
+	app := &Auth{
+		logger:   logger,
+		authRepo: authRepo,
+	}
 	return app
 }
 
 // Auth ....
 type Auth struct {
 	logger   zerolog.Logger
-	authRepo repositories.User
+	authRepo repositories.UserRepository
 }
 
 type RegisterUserInput struct {

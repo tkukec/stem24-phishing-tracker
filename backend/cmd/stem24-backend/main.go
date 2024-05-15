@@ -46,7 +46,10 @@ var (
 	runtimeBag         *runtimebag.Bag
 
 	// Controllers
-	authController *httpControllers.Auth
+	authController    *httpControllers.Auth
+	eventController   *httpControllers.Event
+	commentController *httpControllers.Comments
+	statusController  *httpControllers.Status
 )
 
 // @title STEM-24 Git Good Backend service
@@ -71,7 +74,7 @@ func main() {
 	}
 
 	buildLogs()
-	authentication()
+	//authentication()
 	databaseConnection()
 	migrations()
 	buildDependencies()
@@ -202,7 +205,7 @@ func seeding() {
 func buildLogs() {
 	createLogsDirectory()
 	log.Println("Building logs ...")
-	writers = logging.GetLogWriters("logs/agent-management.log", 15, 1024, 7, constants.ServiceName)
+	writers = logging.GetLogWriters("logs/stem24-backend.log", 15, 1024, 7, constants.ServiceName)
 	amLogger = zerolog.New(io.MultiWriter(writers.Writers()...)).Level(logLevel())
 }
 
@@ -211,6 +214,44 @@ func buildDependencies() {
 	runtimeBag = runtimebag.NewBagWithPreloadedEnvs()
 	prometheusRegistry = prometheus.NewRegistry()
 	chassisMetrics = metrics.NewMetrics(prometheusRegistry)
+
+	baseController := httpControllers.NewController(repositories.NewTenant(conn))
+
+	authApp := application.NewAuth(
+		repositories.NewUser(conn),
+		amLogger,
+	)
+	authController = httpControllers.NewAuth(
+		authApp,
+		baseController,
+	)
+
+	eventApp := application.NewEvent(
+		repositories.NewEvent(conn),
+		amLogger,
+	)
+	eventController = httpControllers.NewEvent(
+		eventApp,
+		baseController,
+	)
+
+	commentApp := application.NewComment(
+		repositories.NewComment(conn),
+		amLogger,
+	)
+	commentController = httpControllers.NewComments(
+		commentApp,
+		baseController,
+	)
+
+	statusApp := application.NewStatus(
+		repositories.NewStatus(conn),
+		amLogger,
+	)
+	statusController = httpControllers.NewStatus(
+		statusApp,
+		baseController,
+	)
 }
 
 func httpRouter() *gin.Engine {
@@ -275,6 +316,23 @@ func httpRouter() *gin.Engine {
 	router.POST("/api/otp/verify", authController.VerifyOTP)
 	router.POST("/api/otp/validate", authController.ValidateOTP)
 	router.POST("/api/otp/disable", authController.DisableOTP)
+
+	router.GET("/api/events", eventController.GetAll)
+	router.GET("/api/events/:id", eventController.Get)
+	router.POST("/api/events", eventController.Create)
+	router.PUT("/api/events/:id", eventController.Update)
+	router.DELETE("/api/events/:id", eventController.Delete)
+
+	router.GET("/api/comments", commentController.GetAll)
+	router.GET("/api/comments/:id", commentController.Get)
+	router.POST("/api/comments", commentController.Create)
+	router.PUT("/api/comments/:id", commentController.Update)
+
+	router.GET("/api/statuses", statusController.GetAll)
+	router.GET("/api/statuses/:id", statusController.Get)
+	router.POST("/api/statuses", statusController.Create)
+	router.PUT("/api/statuses/:id", statusController.Update)
+	router.DELETE("/api/statuses/:id", statusController.Delete)
 	return router
 }
 
