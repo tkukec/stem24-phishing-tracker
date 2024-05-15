@@ -10,6 +10,8 @@ import {AuthProvider} from "./context/AuthProvider.tsx";
 import Root from "./layouts/Root.tsx";
 import {ReactQueryDevtools} from "@tanstack/react-query-devtools";
 import {LoginPage} from "./pages/LoginPage.tsx";
+import {RegisterPage} from "./pages/RegisterPage.tsx";
+import SearchPage from "./pages/SearchPage.tsx";
 import PhishingEventFormPage from "@/pages/PhishingEventFormPage.tsx";
 
 const router = createBrowserRouter([
@@ -31,8 +33,17 @@ const router = createBrowserRouter([
     },
     {
         path: "/login",
-        element: <App/>,
-        errorElement: <LoginPage/>,
+        element: <LoginPage/>,
+        errorElement: <ErrorPage/>,
+    },
+    {
+        path: "/register",
+        element: <RegisterPage/>,
+        errorElement: <ErrorPage/>,
+    },
+    {
+        path: "/search",
+        element: <SearchPage/>,
     },
     {
         path: "/phishing-add",

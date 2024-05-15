@@ -1,0 +1,7 @@
+.vscode
+.idea
+/logs
+/vendor
+.env
+
+public_key.pem
