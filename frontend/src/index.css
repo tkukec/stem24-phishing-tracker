@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
+/* :root {
     font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
     line-height: 1.5;
     font-weight: 400;
@@ -68,6 +68,83 @@ button:focus-visible {
     }
     button {
         background-color: #f9f9f9;
+    }
+} */
+
+:root {
+    --warning: 38 92% 50%;
+    --warning-foreground: 48 96% 89%;
+    --radius: 12px;
+}
+@layer utilities {
+    .heading1 {
+        @apply text-[64px] leading-[67.2px] font-bold;
+    }
+
+    .heading1-mobile {
+        @apply text-[35px] leading-[36.75px] font-bold;
+    }
+
+    .heading2 {
+        @apply text-[48px] leading-[50.4px] font-bold;
+    }
+
+    .heading3-b {
+        @apply text-[36px] leading-[37.8px] font-bold tracking-[-0.36px];
+    }
+    .heading3 {
+        @apply text-[32px] leading-[33.6px] font-semibold;
+    }
+
+    .heading3-medium {
+        @apply text-[32px] leading-[33.6px] font-medium;
+    }
+
+    .heading4 {
+        @apply text-[24px] leading-[24px] font-semibold;
+    }
+
+    .base-regular {
+        @apply text-[24px] leading-[31.2px] font-normal;
+    }
+
+    .base-semibold {
+        @apply text-[24px] leading-[31.2px] font-semibold;
+    }
+    .base-bold {
+        @apply text-[24px] leading-[31.2px] font-bold;
+    }
+
+    .paragraph-regular {
+        @apply text-[20px] leading-[26px] font-normal;
+    }
+
+    .paragraph-semibold {
+        @apply text-[20px] leading-[26px] font-semibold;
+    }
+
+    .body-regular {
+        @apply text-[16px] leading-[20.8px] font-normal;
+    }
+
+    .body-semibold {
+        @apply text-[16px] leading-[20.8px] font-semibold;
+    }
+
+    .body-medium {
+        @apply text-[16px] leading-[22.4px] font-medium;
+    }
+
+    .small-regular {
+        @apply text-[14px] leading-[17.5px] font-normal;
+    }
+
+    .small-semibold {
+        @apply text-[14px] leading-[17.5px] font-semibold;
+    }
+
+    .small-semibold-mobile {
+        @apply text-[12px] leading-[15px] font-semibold tracking-[2px];
     }
 }
 
