@@ -19,7 +19,7 @@ const AuthService = {
         return useMutation<RefreshTokenResponse, Error, LoginData>({
             mutationFn: async ({ email, password }) => {
                 const response = await axiosPublic.post<RefreshTokenResponse>(
-                    "/auth/login",
+                    "/login",
                     { email, password },
                     { withCredentials: true },
                 );
@@ -70,7 +70,11 @@ const AuthService = {
     ) => {
         return useMutation({
             mutationFn: async (registerData) => {
-                const response = await axiosPublic.post<T>("/auth/signup", registerData);
+                const response = await axiosPublic.post<T>("/register", {
+                    password: registerData.password,
+                    email: registerData.email,
+                    name: `${registerData.firstName} ${registerData.lastName}`,
+                });
                 return response.data;
             },
             ...mutationOptions,
