@@ -5,13 +5,13 @@ Welcome to our cutting-edge server application! This README will enlighten you o
 
 ### Technologies Used
 1. **Golang**: Our server-side application is built using Go, a paradigm-shifting, high-performance programming language renowned for its speed and efficiency.
-2. **JWT Tokens**: We employ the cutting-edge technology of JSON Web Tokens (JWT) for authentication and authorization, ensuring airtight security and granting seamless access to our server's resources.
-3. **Roles on User Model**: Our server boasts role-based access control, empowering administrators to finely tune access permissions and enabling unprecedented levels of granularity.
-4. **Password Hashing**: User passwords are meticulously hashed using state-of-the-art algorithms, safeguarding the sanctity and confidentiality of user credentials with unyielding fortitude.
-5. **Metrics with Prometheus**: Prometheus, the titan of monitoring systems, is seamlessly integrated into our server application, empowering stakeholders with unparalleled insights into performance metrics and behavioral analytics.
-6. **Tenants**: Our server proudly supports multi-tenancy, championing the cause of data isolation and fostering an ecosystem where each client or user group thrives independently.
-7. **2FA with Google Auth**: Experience the pinnacle of security with Two-Factor Authentication (2FA) leveraging the power of Google Authenticator, providing an impenetrable shield against unauthorized access.
-8. **Form Validation on Backend**: Backend form validation stands as the vanguard against malicious input, ensuring data integrity with rigorous scrutiny and unwavering vigilance.
+2. **JWT Tokens**: We employ the cutting-edge technology of JSON Web Tokens (JWT) for authentication and authorization, ensuring airtight security and granting seamless access to our server's resources. Using github.com/golang-jwt/jwt/v5 and jwt.NewWithClaims method with SHA256 hashing
+3. **Roles on User Model**: Our server boasts role-based access control, empowering administrators to finely tune access permissions and enabling unprecedented levels of granularity. Idea was to have Admin, Basic User and Anonymous role but the its mainly still WIP as we didn't have enough time to implement this fully.
+4. **Password Hashing**: User passwords are meticulously hashed using state-of-the-art algorithms, safeguarding the sanctity and confidentiality of user credentials with unyielding fortitude. ![image](https://github.com/andrezz-b/stem24-phishing-tracker/assets/67901712/70bf791a-198c-40a3-bf64-89e9d1ae2ef9)
+5. **Metrics with Prometheus**: Prometheus, the titan of monitoring systems, is seamlessly integrated into our server application, empowering stakeholders with unparalleled insights into performance metrics and behavioral analytics. Prometheus is run in seprate docker container just like database.
+6. **Tenants**: Our server proudly supports multi-tenancy, championing the cause of data isolation and fostering an ecosystem where each client or user group thrives independently. Multi tenantcy or single tenantcy is controlled through env
+7. **2FA with Google Auth**: Experience the pinnacle of security with Two-Factor Authentication (2FA) leveraging the power of Google Authenticator, providing an impenetrable shield against unauthorized access. Using github.com/pquerna/otp package
+8. **Form Validation on Backend**: Backend form validation stands as the vanguard against malicious input, ensuring data integrity with rigorous scrutiny and unwavering vigilance. Using offical validation v10 golang package.
 
 ### Frontend Integration
 Our server harmoniously integrates with frontend applications, orchestrating secure and lightning-fast communication. Behold the marvels of frontend integration:
