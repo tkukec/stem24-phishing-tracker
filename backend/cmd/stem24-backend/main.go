@@ -26,6 +26,7 @@ import (
 	"github.com/rs/zerolog"
 	"io"
 	"log"
+	"math"
 	"net/http"
 	"os"
 	"os/signal"
@@ -46,7 +47,10 @@ var (
 	runtimeBag         *runtimebag.Bag
 
 	// Controllers
-	authController *httpControllers.Auth
+	authController    *httpControllers.Auth
+	commentController *httpControllers.Comments
+	eventController   *httpControllers.Event
+	statusController  *httpControllers.Status
 )
 
 // @title STEM-24 Git Good Backend service
@@ -71,7 +75,7 @@ func main() {
 	}
 
 	buildLogs()
-	authentication()
+	//authentication()
 	databaseConnection()
 	migrations()
 	buildDependencies()
@@ -160,22 +164,22 @@ func databaseConnection() {
 
 	maxIdleConns64 := runtimebag.GetEnvInt(constants.MaxIdleConns, 0)
 	if maxIdleConns64 > math.MaxInt32 {
-			log.Fatalf("MaxIdleConns value is too large: %d", maxIdleConns64)
+		log.Fatalf("MaxIdleConns value is too large: %d", maxIdleConns64)
 	}
 	maxIdleConns := int(maxIdleConns64)
-	
+
 	maxOpenConns64 := runtimebag.GetEnvInt(constants.MaxOpenConns, 0)
 	if maxOpenConns64 > math.MaxInt32 {
-			log.Fatalf("MaxOpenConns value is too large: %d", maxOpenConns64)
+		log.Fatalf("MaxOpenConns value is too large: %d", maxOpenConns64)
 	}
 	maxOpenConns := int(maxOpenConns64)
-	
+
 	connMaxLifetime64 := runtimebag.GetEnvInt(constants.ConnMaxLifetime, 0)
 	if connMaxLifetime64 > math.MaxInt32 {
-			log.Fatalf("ConnMaxLifetime value is too large: %d", connMaxLifetime64)
+		log.Fatalf("ConnMaxLifetime value is too large: %d", connMaxLifetime64)
 	}
 	connMaxLifetime := int(connMaxLifetime64)
-	
+
 	err = conn.ConfigConnectionPooling(maxIdleConns, maxOpenConns, connMaxLifetime)
 	if err != nil {
 		log.Panic(err.Error())
@@ -225,6 +229,44 @@ func buildDependencies() {
 	runtimeBag = runtimebag.NewBagWithPreloadedEnvs()
 	prometheusRegistry = prometheus.NewRegistry()
 	chassisMetrics = metrics.NewMetrics(prometheusRegistry)
+
+	baseController := httpControllers.NewController(repositories.NewTenant(conn))
+
+	authApp := application.NewAuth(
+		repositories.NewUser(conn),
+		amLogger,
+	)
+	authController = httpControllers.NewAuth(
+		authApp,
+		baseController,
+	)
+
+	commentApp := application.NewComment(
+		repositories.NewComment(conn),
+		amLogger,
+	)
+	commentController = httpControllers.NewComments(
+		commentApp,
+		baseController,
+	)
+
+	statusApp := application.NewStatus(
+		repositories.NewStatus(conn),
+		amLogger,
+	)
+	statusController = httpControllers.NewStatus(
+		statusApp,
+		baseController,
+	)
+
+	eventApp := application.NewEvent(
+		repositories.NewEvent(conn),
+		amLogger,
+	)
+	eventController = httpControllers.NewEvent(
+		eventApp,
+		baseController,
+	)
 }
 
 func httpRouter() *gin.Engine {
@@ -289,6 +331,25 @@ func httpRouter() *gin.Engine {
 	router.POST("/api/otp/verify", authController.VerifyOTP)
 	router.POST("/api/otp/validate", authController.ValidateOTP)
 	router.POST("/api/otp/disable", authController.DisableOTP)
+
+	router.GET("/api/events", eventController.GetAll)
+	router.GET("/api/events/:id", eventController.Get)
+	router.POST("/api/events", eventController.Create)
+	router.PUT("/api/events/:id", eventController.Update)
+	router.DELETE("/api/events/:id", eventController.Delete)
+
+	router.GET("/api/status", statusController.GetAll)
+	router.GET("/api/status/:id", statusController.Get)
+	router.POST("/api/status", statusController.Create)
+	router.PUT("/api/status/:id", statusController.Update)
+	router.DELETE("/api/status/:id", statusController.Delete)
+
+	router.GET("/api/comments", commentController.GetAll)
+	router.GET("/api/comments/:id", commentController.Get)
+	router.POST("/api/comments", commentController.Create)
+	router.PUT("/api/comments/:id", commentController.Update)
+	router.DELETE("/api/comments/:id", commentController.Delete)
+
 	return router
 }
 
