@@ -15,5 +15,15 @@ Our server integrates seamlessly with frontend applications, providing secure an
 2. **Form Validation**: Frontend form validation is implemented to provide a smooth and error-free user experience.
 3. **Security-focused Packages**: We use the most up-to-date packages with no known security vulnerabilities to mitigate risks and ensure a robust security posture.
 
+### Domain-Driven Design (DDD) in Golang
+
+Our server application follows the principles of Domain-Driven Design (DDD) to ensure that our codebase reflects the real-world problem domain and fosters a clear understanding of our business logic. In DDD, the core focus is on modeling the domain, its entities, behaviors, and interactions, which aligns perfectly with the design philosophy of Golang.
+
+In our implementation, we structure our codebase around domain concepts, such as users, authentication, authorization, and resource management. Each domain entity is represented as a struct in Go, encapsulating both data and behavior relevant to that entity. By adopting DDD principles, we promote modularity, maintainability, and scalability in our codebase.
+
+Furthermore, DDD encourages the use of ubiquitous language, ensuring that domain concepts are represented consistently across our codebase and communication channels. This helps in fostering collaboration between developers, domain experts, and stakeholders, leading to a shared understanding of the system.
+
+In summary, Domain-Driven Design in Golang guides our development process, resulting in a robust and well-structured server application that aligns closely with our business requirements and promotes clarity and maintainability in our codebase.
+
 ## Bonus task
 - Using eslint, husky and lint staged
