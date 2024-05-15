@@ -11,6 +11,7 @@ import {
     PaginationPrevious,
 } from "@/components/ui/pagination";
 import { IPhishingEvent, PhishingEventSearchData } from "@/interfaces/PhishingEventIntefaces";
+import Navbar from "@/layouts/Navbar";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
     Accordion,
@@ -92,135 +93,141 @@ const SearchPage = () => {
     };
 
     return (
-        <div className="flex justify-center py-10 px-4">
-            <div className="flex flex-col gap-6">
-                <h2>Search page</h2>
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)}>
-                        <Accordion type="single" collapsible className="w-full">
-                            <AccordionItem value="item-1">
-                                <div className="flex gap-5">
-                                    <FormField
-                                        control={form.control}
-                                        name="name"
-                                        render={({ field }) => (
-                                            <FormItem className="w-full">
-                                                <FormControl>
-                                                    <Input
-                                                        placeholder="Search by name"
-                                                        {...field}
-                                                    />
-                                                </FormControl>
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <AccordionTrigger className="text-sm flex gap-2" asChild>
-                                        <Button variant="outline">Advanced</Button>
-                                    </AccordionTrigger>
-                                    <Button
-                                        type="submit"
-                                        className="bg-theme hover:opacity-60 hover:bg-theme"
-                                    >
-                                        Search
-                                    </Button>
-                                </div>
-                                <AccordionContent className="flex flex-col gap-2 mt-4">
-                                    <FormField
-                                        control={form.control}
-                                        name="brand"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormControl>
-                                                    <Input placeholder="Brand" {...field} />
-                                                </FormControl>
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="domainName"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormControl>
-                                                    <Input placeholder="Domain Name" {...field} />
-                                                </FormControl>
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="keywords"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormControl>
-                                                    <Input placeholder="Keywords" {...field} />
-                                                </FormControl>
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="endDate"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormControl>
-                                                    <Input
-                                                        type="date"
-                                                        placeholder="End Date"
-                                                        {...field}
-                                                    />
-                                                </FormControl>
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="startDate"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormControl>
-                                                    <Input
-                                                        type="date"
-                                                        placeholder="Start Date"
-                                                        {...field}
-                                                    />
-                                                </FormControl>
-                                            </FormItem>
-                                        )}
-                                    />
-                                </AccordionContent>
-                            </AccordionItem>
-                        </Accordion>
-                    </form>
-                </Form>
+        <>
+            <Navbar />
+            <div className="flex justify-center py-10 px-4">
+                <div className="flex flex-col gap-6">
+                    <h2>Search page</h2>
+                    <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)}>
+                            <Accordion type="single" collapsible className="w-full">
+                                <AccordionItem value="item-1">
+                                    <div className="flex gap-5">
+                                        <FormField
+                                            control={form.control}
+                                            name="name"
+                                            render={({ field }) => (
+                                                <FormItem className="w-full">
+                                                    <FormControl>
+                                                        <Input
+                                                            placeholder="Search by name"
+                                                            {...field}
+                                                        />
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <AccordionTrigger className="text-sm flex gap-2" asChild>
+                                            <Button variant="outline">Advanced</Button>
+                                        </AccordionTrigger>
+                                        <Button
+                                            type="submit"
+                                            className="bg-theme hover:opacity-60 hover:bg-theme"
+                                        >
+                                            Search
+                                        </Button>
+                                    </div>
+                                    <AccordionContent className="flex flex-col gap-2 mt-4">
+                                        <FormField
+                                            control={form.control}
+                                            name="brand"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormControl>
+                                                        <Input placeholder="Brand" {...field} />
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="domainName"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormControl>
+                                                        <Input
+                                                            placeholder="Domain Name"
+                                                            {...field}
+                                                        />
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="keywords"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormControl>
+                                                        <Input placeholder="Keywords" {...field} />
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="endDate"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormControl>
+                                                        <Input
+                                                            type="date"
+                                                            placeholder="End Date"
+                                                            {...field}
+                                                        />
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="startDate"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormControl>
+                                                        <Input
+                                                            type="date"
+                                                            placeholder="Start Date"
+                                                            {...field}
+                                                        />
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </AccordionContent>
+                                </AccordionItem>
+                            </Accordion>
+                        </form>
+                    </Form>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    {events.map((event) => (
-                        <PhishingEventCard key={event.id} event={event} />
-                    ))}
-                    {events.map((event) => (
-                        <PhishingEventCard key={event.id} event={event} />
-                    ))}
-                    {events.map((event) => (
-                        <PhishingEventCard key={event.id} event={event} />
-                    ))}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        {events.map((event) => (
+                            <PhishingEventCard key={event.id} event={event} />
+                        ))}
+                        {events.map((event) => (
+                            <PhishingEventCard key={event.id} event={event} />
+                        ))}
+                        {events.map((event) => (
+                            <PhishingEventCard key={event.id} event={event} />
+                        ))}
+                    </div>
+                    <Pagination>
+                        <PaginationContent>
+                            {query.hasPreviousPage && (
+                                <PaginationItem>
+                                    <PaginationPrevious href="#" />
+                                </PaginationItem>
+                            )}
+                            {query.hasNextPage && (
+                                <PaginationItem>
+                                    <PaginationNext href="#" />
+                                </PaginationItem>
+                            )}
+                        </PaginationContent>
+                    </Pagination>
                 </div>
-                <Pagination>
-                    <PaginationContent>
-                        {query.hasPreviousPage && (
-                            <PaginationItem>
-                                <PaginationPrevious href="#" />
-                            </PaginationItem>
-                        )}
-                        {query.hasNextPage && (
-                            <PaginationItem>
-                                <PaginationNext href="#" />
-                            </PaginationItem>
-                        )}
-                    </PaginationContent>
-                </Pagination>
             </div>
-        </div>
+        </>
     );
 };
 
