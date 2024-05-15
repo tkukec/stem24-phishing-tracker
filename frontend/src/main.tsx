@@ -11,6 +11,7 @@ import Root from "./layouts/Root.tsx";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { LoginPage } from "./pages/LoginPage.tsx";
 import { RegisterPage } from "./pages/RegisterPage.tsx";
+import SearchPage from "./pages/SearchPage.tsx";
 
 const router = createBrowserRouter([
     {
@@ -39,6 +40,10 @@ const router = createBrowserRouter([
         element: <RegisterPage />,
         errorElement: <ErrorPage />,
     },
+    {
+        path: "/search",
+        element: <SearchPage />,
+    }
 ]);
 
 const queryClient = new QueryClient();
