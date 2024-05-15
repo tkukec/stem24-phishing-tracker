@@ -10,7 +10,6 @@ WORKDIR /app
 
 COPY . .
 
-ENV GOPRIVATE=git.asseco-see.hr/asseco-hr-voice/evil/go-chassis/v2
 
 RUN mkdir -p -m 0600 /root/.ssh && echo "StrictHostKeyChecking no" >> /root/.ssh/config
 RUN --mount=type=ssh GO111MODULE=on go mod download -x
@@ -26,7 +25,7 @@ EXPOSE 8080
 # random UID.
 RUN chown -R 1001:0 /app
 
-ENTRYPOINT go run cmd/agent-management/main.go
+ENTRYPOINT go run cmd/stem24-backend/main.go
 
 # Run container by default as user with id 1001 (default)
 USER 1001

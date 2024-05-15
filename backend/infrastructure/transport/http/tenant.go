@@ -1,10 +1,9 @@
 package http
 
 import (
-	"github.com/asseco-voice/agent-management/application"
-	"github.com/asseco-voice/agent-management/domain/models"
-	"github.com/asseco-voice/agent-management/infrastructure/dto"
-	"github.com/asseco-voice/agent-management/shared/exceptions"
+	"github.com/andrezz-b/stem24-phishing-tracker/application"
+	"github.com/andrezz-b/stem24-phishing-tracker/infrastructure/dto"
+	"github.com/andrezz-b/stem24-phishing-tracker/shared/exceptions"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"net/http"
@@ -45,12 +44,6 @@ func (t *Tenant) Create(ctx *gin.Context) {
 		ctx.JSON(exception.Status(), exception.ToDto())
 		return
 	}
-	request.SeedSignals = models.SignalSeed()
-	request.ActivityStatus = models.ActivityStatusSeed()
-	request.SeedSystemStatuses = models.SystemStatusSeed()
-	request.SeedBasicStatuses = models.BasicStatusSeed()
-	request.SeedGlobalStatuses = models.GlobalSeed()
-	request.SeedChannels = models.ChannelSeed()
 	tenant, appErr := t.tenantApp.Create(requestContext, request)
 	if appErr != nil {
 		ctx.JSON(appErr.Status(), appErr.ToDto())

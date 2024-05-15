@@ -1,10 +1,9 @@
 package health
 
 import (
-	repositories "git.asseco-see.hr/asseco-hr-voice/evil/go-chassis/v2/pkg/database"
-	"git.asseco-see.hr/asseco-hr-voice/evil/go-chassis/v2/pkg/shared/constants"
-	"git.asseco-see.hr/asseco-hr-voice/evil/go-chassis/v2/pkg/shared/helpers"
-	"github.com/Azure/go-amqp"
+	"github.com/andrezz-b/stem24-phishing-tracker/shared/constants"
+	"github.com/andrezz-b/stem24-phishing-tracker/shared/database"
+	"github.com/andrezz-b/stem24-phishing-tracker/shared/runtimebag"
 	"net/http"
 )
 
@@ -29,10 +28,7 @@ func Validate() *Response {
 	if err != nil {
 		database = err.Error()
 	}
-	vab := ValidateAmqpBus()
-	if vab != nil {
-		amqpRes = vab.Error()
-	}
+
 	return &Response{
 		Database: database,
 		Amqp:     amqpRes,
@@ -40,14 +36,14 @@ func Validate() *Response {
 }
 
 func ValidateDatabase() error {
-	conn, err := repositories.NewConnection(
-		helpers.GetEnvString(constants.DatabaseDriver, ""),
-		helpers.GetEnvString(constants.DatabaseUser, ""),
-		helpers.GetEnvString(constants.DatabasePass, ""),
-		helpers.GetEnvString(constants.DatabaseHost, ""),
-		helpers.GetEnvString(constants.DatabasePort, ""),
-		helpers.GetEnvString(constants.DatabaseName, ""),
-		helpers.GetEnvBool(constants.DebugDatabase, false),
+	conn, err := database.NewConnection(
+		runtimebag.GetEnvString(constants.DatabaseDriver, ""),
+		runtimebag.GetEnvString(constants.DatabaseUser, ""),
+		runtimebag.GetEnvString(constants.DatabasePass, ""),
+		runtimebag.GetEnvString(constants.DatabaseHost, ""),
+		runtimebag.GetEnvString(constants.DatabasePort, ""),
+		runtimebag.GetEnvString(constants.DatabaseName, ""),
+		runtimebag.GetEnvBool(constants.DebugDatabase, false),
 		nil,
 	)
 	if err != nil {
@@ -58,14 +54,4 @@ func ValidateDatabase() error {
 		return nil
 	}
 	return db.Close()
-}
-
-func ValidateAmqpBus() error {
-	client, err := amqp.Dial("amqp://"+helpers.GetEnvString(constants.BrokerHost, "")+":"+helpers.GetEnvString(constants.BrokerPort, ""),
-		amqp.ConnSASLPlain(helpers.GetEnvString(constants.BrokerUser, ""), helpers.GetEnvString(constants.BrokerPass, "")),
-	)
-	if err != nil {
-		return err
-	}
-	return client.Close()
 }

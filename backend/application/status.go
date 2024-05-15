@@ -1,260 +1,90 @@
 package application
 
 import (
-	"fmt"
-	assecoExceptions "git.asseco-see.hr/asseco-hr-voice/evil/go-chassis/v2/pkg/exceptions"
-	"git.asseco-see.hr/asseco-hr-voice/evil/go-chassis/v2/pkg/shared/context"
-	"github.com/asseco-voice/agent-management/domain/models"
-	"github.com/asseco-voice/agent-management/infrastructure/repositories"
-	"github.com/asseco-voice/agent-management/shared/exceptions"
+	"github.com/andrezz-b/stem24-phishing-tracker/domain/models"
+	"github.com/andrezz-b/stem24-phishing-tracker/infrastructure/repositories"
+	"github.com/andrezz-b/stem24-phishing-tracker/shared/context"
+	"github.com/andrezz-b/stem24-phishing-tracker/shared/database"
+	"github.com/andrezz-b/stem24-phishing-tracker/shared/exceptions"
+	"github.com/rs/zerolog"
 )
 
-// NewStatus constructor for GlobalStatus
-func NewStatus(statusRepo repositories.StatusRepository, globalStatus repositories.GlobalStatusRepository) *Status {
-	return &Status{
-		globalStatus: globalStatus,
-		statusRepo:   statusRepo,
-	}
+type Status struct {
+	statusRepo repositories.StatusRepository
+	logger     zerolog.Logger
 }
 
-// Status ....
-type Status struct {
-	globalStatus repositories.GlobalStatusRepository
-	statusRepo   repositories.StatusRepository
+func NewStatus(statusRepo repositories.StatusRepository,
+	logger zerolog.Logger,
+) *Status {
+	return &Status{statusRepo: statusRepo, logger: logger}
 }
 
 type CreateStatusRequest struct {
-	System            bool   `json:"system"`
-	Blocked           bool   `json:"blocked"`
-	StartingStatus    bool   `json:"starting_status"`
-	Reason            string `json:"reason" binding:"required"`
-	Name              string `json:"name" binding:"required"`
-	Label             string `json:"label" binding:"required"`
-	Timer             int64  `json:"timer"`
-	TimerTransitionID string `json:"timer_transition_id"`
-	ChannelID         string `json:"channel_id" binding:"required"`
-	OnReject          bool   `json:"on_reject"`
-	OnTimeout         bool   `json:"on_timeout"`
-	DefaultBlocked    bool   `json:"default_blocked"`
-	DefaultUnblocked  bool   `json:"default_unblocked"`
+	Name    string // Name of the status
+	EventID string
 }
 
-func (c *Status) CreateStatus(ctx *context.RequestContext, request *CreateStatusRequest) (*models.Status, assecoExceptions.ApplicationException) {
-	var timerStatus *models.Status
-	var err error
-
-	if request.Timer != 0 {
-		if timerStatus, err = c.statusRepo.Get(ctx.TenantID(), request.TimerTransitionID); err != nil {
-			return nil, exceptions.BadRequest(map[string][]string{
-				"timer_transition_id": {
-					err.Error(),
-				},
-			}, "")
-		}
+func (a *Status) Create(ctx *context.RequestContext, request *CreateStatusRequest) (*models.Status, exceptions.ApplicationException) {
+	status := &models.Status{
+		Name: request.Name,
 	}
 
-	if request.StartingStatus {
-		oldStartingStatus, err := c.statusRepo.GetByChannelAndIsStarting(ctx.TenantID(), request.ChannelID, true)
-		if err == nil && oldStartingStatus != nil {
-			oldStartingStatus.StartingStatus = false
-			if _, err = c.statusRepo.Update(ctx.TenantID(), oldStartingStatus); err != nil {
-				return nil, exceptions.FailedUpdating(models.ChannelStatusModelName, err)
-			}
-		}
-	}
-
-	channelStatus, err := c.statusRepo.Persist(ctx.TenantID(),
-		models.NewStatus(
-			request.System,
-			request.Blocked,
-			request.StartingStatus,
-			request.OnReject,
-			request.OnTimeout,
-			request.Reason,
-			request.Name,
-			request.Label,
-			request.Timer,
-			timerStatus,
-			request.ChannelID,
-			request.DefaultBlocked,
-			request.DefaultUnblocked))
-
+	status, err := a.statusRepo.Persist(ctx.TenantID(), status)
 	if err != nil {
-		return nil, exceptions.FailedPersisting(models.ChannelStatusModelName, err)
+		return nil, exceptions.FailedPersisting(models.StatusModelName, err)
 	}
-
-	if err = c.syncSiblingStatuses(ctx, channelStatus); err != nil {
-		return nil, exceptions.FailedUpdating(models.ChannelStatusModelName, err)
-	}
-
-	return channelStatus, nil
-}
-
-func (c *Status) syncSiblingStatuses(ctx *context.RequestContext, status *models.Status) error {
-	statusesOfChannel, err := c.statusRepo.GetByChannel(ctx.TenantID(), status.ChannelID, "Transitions")
-	if err != nil {
-		return err
-	}
-
-	for _, channelStatus := range statusesOfChannel {
-		if status.ID == channelStatus.ID {
-			continue
-		}
-
-		if status.DefaultBlocked {
-			channelStatus.DefaultBlocked = false
-		}
-		if status.DefaultUnblocked {
-			channelStatus.DefaultUnblocked = false
-		}
-		_, err = c.statusRepo.Update(ctx.TenantID(), channelStatus)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return status, nil
 }
 
 type UpdateStatusRequest struct {
-	ID                string  `json:"-"`
-	Name              string  `json:"name"`
-	Label             string  `json:"label"`
-	Blocked           bool    `json:"blocked"`
-	Reason            string  `json:"reason"`
-	OnReject          bool    `json:"on_reject"`
-	OnTimeout         bool    `json:"on_timeout"`
-	TimerTransitionID *string `json:"timer_transition_id"`
-	Timer             int64   `json:"timer"`
-	StartingStatus    bool    `json:"starting_status"`
-	DefaultBlocked    bool    `json:"default_blocked"`
-	DefaultUnblocked  bool    `json:"default_unblocked"`
+	Name string // Updated description of the status
+	ID   string // Updated description of the status
 }
 
-func (r *UpdateStatusRequest) UpdateValues(status *models.Status) (*models.Status, error) {
-	if status.Name != r.Name && !status.System {
-		return nil, fmt.Errorf("can not change name of system status")
+func (request *UpdateStatusRequest) ApplyValues(status *models.Status) *models.Status {
+	if request.Name != "" {
+		status.Name = request.Name
 	}
+	// Add similar checks for other fields that can be updated
 
-	if r.DefaultBlocked && r.Blocked {
-		status.DefaultBlocked = true
-	}
-	if r.DefaultUnblocked && !r.Blocked {
-		status.DefaultUnblocked = true
-	}
-
-	status.Label = r.Label
-	status.Blocked = r.Blocked
-	status.Reason = r.Reason
-	status.OnReject = r.OnReject
-	status.OnTimeout = r.OnTimeout
-	status.TimerTransitionID = r.TimerTransitionID
-	status.Timer = r.Timer
-	status.StartingStatus = r.StartingStatus
-	return status, nil
+	return status
 }
-
-func (c *Status) UpdateStatus(ctx *context.RequestContext, request *UpdateStatusRequest) (*models.Status, assecoExceptions.ApplicationException) {
-	var status *models.Status
-	var err error
-	if status, err = c.statusRepo.Get(ctx.TenantID(), request.ID); err != nil {
-		return nil, exceptions.ChannelStatusNotFound(err)
-	}
-	status, err = request.UpdateValues(status)
+func (a *Status) Update(ctx *context.RequestContext, request *UpdateStatusRequest) (*models.Status, exceptions.ApplicationException) {
+	status, err := a.statusRepo.Get(ctx.TenantID(), request.ID)
 	if err != nil {
-		return nil, exceptions.BadRequest(map[string][]string{
-			"status": {
-				err.Error(),
-			},
-		}, "")
+		return nil, exceptions.StatusNotFound(err)
 	}
-
-	if status.TimerTransitionID != nil {
-		if _, err = c.statusRepo.Get(ctx.TenantID(), *status.TimerTransitionID); err != nil {
-			return nil, exceptions.BadRequest(map[string][]string{
-				"timer_transition_id": {
-					err.Error(),
-				},
-			}, "")
-		}
+	status, err = a.statusRepo.Update(ctx.TenantID(), request.ApplyValues(status))
+	if err != nil {
+		return nil, exceptions.FailedUpdating(models.StatusModelName, err)
 	}
-
-	if status.OnReject {
-		existingRejectStatus, err := c.statusRepo.GetOnRejectStatus(ctx.TenantID(), status.ChannelID)
-		if err == nil {
-			existingRejectStatus.OnReject = false
-			if _, err = c.statusRepo.Update(ctx.TenantID(), existingRejectStatus); err != nil {
-				return nil, exceptions.FailedUpdating(models.ChannelStatusModelName, err)
-			}
-		}
-	}
-	if status.OnTimeout {
-		existingTimeoutStatus, err := c.statusRepo.GetOnTimeoutStatus(ctx.TenantID(), status.ChannelID)
-		if err == nil {
-			existingTimeoutStatus.OnTimeout = false
-			if _, err = c.statusRepo.Update(ctx.TenantID(), existingTimeoutStatus); err != nil {
-				return nil, exceptions.FailedUpdating(models.ChannelStatusModelName, err)
-			}
-		}
-	}
-
-	if request.StartingStatus {
-		oldStartingStatus, err := c.statusRepo.GetByChannelAndIsStarting(ctx.TenantID(), status.ChannelID, true)
-		if err == nil && oldStartingStatus != nil {
-			oldStartingStatus.StartingStatus = false
-			if _, err = c.statusRepo.Update(ctx.TenantID(), oldStartingStatus); err != nil {
-				return nil, exceptions.FailedUpdating(models.ChannelStatusModelName, err)
-			}
-		}
-	}
-
-	if status, err = c.statusRepo.Update(ctx.TenantID(), status); err != nil {
-		return nil, exceptions.FailedUpdating(models.ChannelStatusModelName, err)
-	}
-
-	if err = c.syncSiblingStatuses(ctx, status); err != nil {
-		return nil, exceptions.FailedUpdating(models.ChannelStatusModelName, err)
-	}
-
 	return status, nil
 }
 
-func (c *Status) DeleteStatus(ctx *context.RequestContext, ID string) assecoExceptions.ApplicationException {
-	var status *models.Status
-	var err error
-	if status, err = c.statusRepo.Get(ctx.TenantID(), ID); err != nil {
-		return exceptions.ChannelStatusNotFound(err)
+func (a *Status) Delete(ctx *context.RequestContext, ID string) exceptions.ApplicationException {
+	status, err := a.statusRepo.Get(ctx.TenantID(), ID)
+	if err != nil {
+		return exceptions.StatusNotFound(err)
 	}
-	if err = c.statusRepo.Delete(ctx.TenantID(), status); err != nil {
-		return exceptions.FailedDeleting(models.ChannelStatusModelName, err)
+	if err = a.statusRepo.Delete(ctx.TenantID(), status); err != nil {
+		return exceptions.FailedDeleting(models.TenantModelName, err)
 	}
 	return nil
 }
 
-func (c *Status) GetStatus(ctx *context.RequestContext, ID string) (*models.Status, assecoExceptions.ApplicationException) {
-	channelStatus, err := c.statusRepo.Get(ctx.TenantID(), ID, "Transitions.TimerTransition", "TimerTransition")
+func (a *Status) Get(ctx *context.RequestContext, ID string) (*models.Status, exceptions.ApplicationException) {
+	status, err := a.statusRepo.Get(ctx.TenantID(), ID)
 	if err != nil {
-		return nil, exceptions.ChannelStatusNotFound(err)
+		return nil, exceptions.StatusNotFound(err)
 	}
-	return channelStatus, nil
+	return status, nil
 }
 
-type GetAllStatusesRequest struct {
-	Channels []string `json:"channel_id" form:"channel_id"`
-}
-
-func (c *Status) GetAllStatuses(ctx *context.RequestContext, request *GetAllStatusesRequest) ([]*models.Status, assecoExceptions.ApplicationException) {
-	if len(request.Channels) > 0 {
-		statuses, err := c.statusRepo.GetByChannels(ctx.TenantID(), request.Channels, "Transitions.TimerTransition", "TimerTransition")
-		if err != nil {
-			return nil, exceptions.FailedQuerying(models.ChannelStatusModelName, err)
-		}
-		return statuses, nil
-	}
-
-	channelStatuses, err := c.statusRepo.GetAll(ctx.TenantID(), "Transitions.TimerTransition", "TimerTransition")
+func (a *Status) GetAll(ctx *context.RequestContext, request database.GetAllStatusesRequest) ([]*models.Status, exceptions.ApplicationException) {
+	statuss, err := a.statusRepo.GetAll(ctx.TenantID(), request)
 	if err != nil {
-		return nil, exceptions.FailedQuerying(models.ChannelStatusModelName, err)
+		return nil, exceptions.FailedQuerying(models.StatusModelName, err)
 	}
-	return channelStatuses, nil
+	return statuss, nil
 }
