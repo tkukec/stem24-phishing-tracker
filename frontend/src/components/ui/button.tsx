@@ -19,6 +19,7 @@ const buttonVariants = cva(
                 sm: "h-8 rounded-md px-3 text-xs",
             },
             variant: {
+                blue: "bg-theme",
                 default:
                     "bg-slate-900 text-slate-50 shadow hover:bg-slate-900/90 dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90",
                 destructive:
