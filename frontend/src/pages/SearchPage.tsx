@@ -1,6 +1,14 @@
 import PhishingEventCard from "@/components/PhishingEventCard";
 import { Input } from "@/components/ui/input";
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import {
+    Pagination,
+    PaginationContent,
+    PaginationEllipsis,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
+} from "@/components/ui/pagination";
 import { IPhishingEvent } from "@/interfaces/PhishingEventIntefaces";
 
 const events: Array<IPhishingEvent> = [
@@ -10,7 +18,7 @@ const events: Array<IPhishingEvent> = [
         createdAt: new Date(),
         brand: "Brand 1",
         description: "Event 1 description",
-        maliciousUrl: "",
+        maliciousUrl: "test",
         domainRegistrationDate: new Date(),
         keyword: [],
         status: "todo",
