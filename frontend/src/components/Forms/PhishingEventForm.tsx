@@ -42,9 +42,9 @@ const PhishingEventForm = () => {
 
 
     return (
-        <div className="rounded-xl border bg-card text-card-foreground shadow p-8">
+        <div className="rounded-xl border bg-card text-card-foreground shadow p-8 w-40 my-0 min-w-72">
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="flex-col space-y-8">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="flex-col space-y-2">
                     <FormField
                         control={form.control}
                         name="name"
@@ -71,7 +71,7 @@ const PhishingEventForm = () => {
                                     <Input {...field} />
                                 </FormControl>
                                 <FormDescription>
-                                    What brand did this phishing affects
+                                    What brands have been affected by this phishing
                                 </FormDescription>
                                 <FormMessage/>
                             </FormItem>
