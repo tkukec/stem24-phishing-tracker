@@ -120,7 +120,7 @@ const PhishingEventForm = () => {
                         <FormControl>
                             <>
                                 <Input disabled value={(watch("domainRegistrationDate") ?? "").toString() ?? ""}/>
-                                                 </>
+                            </>
                         </FormControl>
                     </FormItem>
 
