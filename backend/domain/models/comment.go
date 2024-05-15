@@ -7,7 +7,7 @@ const (
 type Comment struct {
 	Model
 	Description string `gorm:"type:varchar(1500);not null"`
-	EventID     string `gorm:"foreignKey:EventID"`
+	EventID     string
 }
 
 func NewComment(description string) *Comment {
